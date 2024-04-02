@@ -32,6 +32,9 @@ io.on("connection", (socket) => {
         (await io.in(roomId).fetchSockets()).length
       );
     });
+    socket.on("chang", (data) => {
+      io.to(roomId).emit("creat", data);
+    });
     //
   });
 });
