@@ -10,8 +10,8 @@ let creat = true,
 
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 
-paper.width = 5000;
-paper.height = 5000;
+paper.width = 3000;
+paper.height = 3000;
 
 const cnx = paper.getContext("2d");
 
