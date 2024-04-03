@@ -38,6 +38,9 @@ io.on("connection", (socket) => {
     socket.on("up", () => {
       io.to(roomId).emit("uped");
     });
+    socket.on("peerId", (data) => {
+      socket.broadcast.to(roomId).emit("peerConnet", data);
+    });
     //
   });
 });

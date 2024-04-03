@@ -2,12 +2,18 @@ import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
 
 const paper = document.getElementById("paper");
 const socket = io("/");
+const peer = new Peer();
 const inrom = document.getElementById("inroom");
 let click = false;
 let x, y;
 let creat = true,
   lastcreat = true,
   lestSoketId = null;
+
+peer.on("open", function (id) {
+  console.log(id);
+  socket.emit("peerId", id);
+});
 
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 
@@ -69,3 +75,52 @@ socket.on("creat", (data) => {
   lastcreat = data.creat;
   cnx.stroke();
 });
+
+socket.on("peerConnet", (data) => {
+  navigator.mediaDevices
+    .getUserMedia({ audio: true, video: false })
+    .then((stram) => {
+      callUser(data, stram);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+navigator.mediaDevices
+  .getUserMedia({ audio: true, video: false })
+  .then((stram) => {
+    peer.on("call", (call) => {
+      call.answer(stram);
+      const aud = document.createElement("audio");
+      audAppend(aud, stram);
+      callsGood();
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+function audAppend(aud, stram) {
+  aud.srcObject = stram;
+  document.body.appendChild(aud);
+  aud.addEventListener("loadedmetadata", () => {
+    aud.play();
+  });
+}
+
+function callUser(data, stram) {
+  let call = peer.call(data, stram);
+  call.on("stream", (stream) => {
+    const aud = document.createElement("audio");
+    audAppend(aud, stream);
+    callsGood();
+  });
+}
+
+function callsGood() {
+  let div = document.createElement("div");
+  div.style.cssText =
+    "width: 20px;height: 20px;background: red;border-radius: 50%;position: fixed;bottom: 0;right: 0;margin: 10px;";
+  document.body.appendChild(div);
+}
