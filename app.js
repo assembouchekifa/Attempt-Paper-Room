@@ -33,7 +33,10 @@ io.on("connection", (socket) => {
       );
     });
     socket.on("chang", (data) => {
-      io.to(roomId).emit("creat", data);
+      io.to(roomId).emit("creat", { ...data, socketId: socket.id });
+    });
+    socket.on("up", () => {
+      io.to(roomId).emit("uped");
     });
     //
   });

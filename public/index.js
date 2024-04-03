@@ -6,7 +6,8 @@ const inrom = document.getElementById("inroom");
 let click = false;
 let x, y;
 let creat = true,
-  lastcreat = true;
+  lastcreat = true,
+  lestSoketId = null;
 
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 
@@ -22,14 +23,6 @@ addEventListener("mousedown", (e) => {
   if (e.button != 1) {
     click = true;
   }
-  // cnx.beginPath();
-  // if (e.button == 0) {
-
-  // } else if (e.button == 2) {
-  //   cnx.strokeStyle = "#000";
-  //   cnx.lineWidth = 15;
-  // }
-
   if (e.button == 0) {
     creat = true;
   } else if (e.button == 2) {
@@ -38,7 +31,6 @@ addEventListener("mousedown", (e) => {
 });
 
 addEventListener("mouseup", (e) => {
-  // cnx.closePath();
   socket.emit("up");
   click = false;
 });
@@ -47,8 +39,6 @@ addEventListener("mousemove", (e) => {
   x = e.offsetX;
   y = e.offsetY;
   if (click) {
-    // cnx.lineTo(x, y);
-    // cnx.stroke();
     socket.emit("chang", { x, y, creat });
   }
 });
@@ -57,23 +47,25 @@ socket.emit("joinRoom", roomId);
 socket.on("onconnect", (data) => {
   inrom.innerText = data;
 });
+socket.on("uped", () => {
+  lestSoketId = null;
+});
 
 socket.on("creat", (data) => {
-  if (data.creat != lastcreat) {
+  if (data.creat != lastcreat || data.socketId != lestSoketId) {
     cnx.closePath();
     cnx.beginPath();
   }
   if (data.creat == true) {
     cnx.strokeStyle = "#fff";
     cnx.lineWidth = 3;
-    cnx.moveTo(data.x - 3, data.y - 3);
     cnx.lineTo(data.x, data.y);
   } else {
     cnx.strokeStyle = "#000";
     cnx.lineWidth = 15;
-    cnx.moveTo(data.x - 15, data.y - 15);
     cnx.lineTo(data.x, data.y);
   }
+  lestSoketId = data.socketId;
   lastcreat = data.creat;
   cnx.stroke();
 });
