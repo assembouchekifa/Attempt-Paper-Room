@@ -76,25 +76,20 @@ socket.on("creat", (data) => {
   cnx.stroke();
 });
 
-socket.on("peerConnet", (data) => {
-  navigator.mediaDevices
-    .getUserMedia({ audio: true, video: false })
-    .then((stram) => {
-      callUser(data, stram);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
-
 navigator.mediaDevices
   .getUserMedia({ audio: true, video: false })
-  .then((stram) => {
+  .then((stram1) => {
     peer.on("call", (call) => {
-      call.answer(stram);
-      const aud = document.createElement("audio");
-      audAppend(aud, stram);
-      callsGood();
+      call.answer(stram1);
+      call.on("stream", (stram2) => {
+        const aud = document.createElement("audio");
+        audAppend(aud, stram2);
+        callsGood();
+      });
+    });
+
+    socket.on("peerConnet", (data) => {
+      callUser(data, stram1);
     });
   })
   .catch((err) => {
@@ -109,11 +104,12 @@ function audAppend(aud, stram) {
   });
 }
 
-function callUser(data, stram) {
-  let call = peer.call(data, stram);
-  call.on("stream", (stream) => {
+function callUser(data, stram2) {
+  console.log(data);
+  let call = peer.call(data, stram2);
+  call.on("stream", (stream1) => {
     const aud = document.createElement("audio");
-    audAppend(aud, stream);
+    audAppend(aud, stream1);
     callsGood();
   });
 }
